@@ -1,0 +1,5 @@
+.venv
+*.hcl
+.idea/*
+.terraform
+modules.xml
