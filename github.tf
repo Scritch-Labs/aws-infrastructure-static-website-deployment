@@ -20,3 +20,11 @@ resource "github_actions_variable" "iam_role_arn_variable" {
 
   depends_on = [aws_iam_role.role_to_access, github_repository.repo]
 }
+
+resource "github_actions_variable" "cloud_front_distribution_id" {
+  repository    = github_repository.repo.name
+  variable_name = "CLOUDFRONT_DISTRIBUTION_ID"
+  value         = aws_cloudfront_distribution.my_distribution.id
+
+  depends_on = [aws_cloudfront_distribution.my_distribution, github_repository.repo]
+}
