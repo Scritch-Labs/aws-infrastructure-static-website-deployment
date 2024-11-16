@@ -28,3 +28,11 @@ resource "github_actions_variable" "cloud_front_distribution_id" {
 
   depends_on = [aws_cloudfront_distribution.my_distribution, github_repository.repo]
 }
+
+resource "github_actions_variable" "aws_region" {
+  repository    = github_repository.repo.name
+  variable_name = "AWS_REGION"
+  value         = var.aws_region
+
+  depends_on = [aws_cloudfront_distribution.my_distribution, github_repository.repo]
+}
