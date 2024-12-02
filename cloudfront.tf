@@ -26,7 +26,7 @@ data "aws_iam_policy_document" "allow_cloudfront_access" {
 }
 
 data "aws_cloudfront_function" "www-redirect-to-nonwww" {
-  name = "www-redirect-to-nonwww"
+  name = "www-redirect-with-index-redirection"
   stage = "LIVE"
 }
 
