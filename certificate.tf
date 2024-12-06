@@ -6,11 +6,10 @@ resource "aws_acm_certificate" "certificate" {
   subject_alternative_names = [
     var.domain_name
   ]
-  certificate_chain = ""
   validation_method = "DNS"
   lifecycle {
     create_before_destroy = true
-    ignore_changes = [aws_acm_certificate.certificate.certificate_body]
+    ignore_changes = [certificate_body]
   }
 
   tags = local.tags.default
