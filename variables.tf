@@ -46,6 +46,14 @@ variable "aws_oidc_thumbprint" {
   sensitive   = true
 }
 
+variable "cloudfront_origins" {
+  description = "A list of origins for the cloudfront distribution."
+  type = list(object({
+    domain_name              = string
+    origin_access_control_id = string
+    origin_id                = string
+  }))
+}
 
 locals {
   s3_bucket_name    = "${var.domain_name}-website"

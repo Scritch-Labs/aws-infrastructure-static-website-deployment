@@ -80,6 +80,15 @@ resource "aws_cloudfront_distribution" "my_distribution" {
     origin_id                = local.cloud-front.origin_id
   }
 
+  dynamic "origin" {
+    for_each = var.cloudfront_origins
+    content {
+        domain_name              = origin.value.domain_name
+        origin_access_control_id = origin.value.origin_access_control_id
+        origin_id                = origin.value.origin_id
+    }
+  }
+
   enabled             = true
   comment             = "${var.client_name} Website"
   is_ipv6_enabled     = true
