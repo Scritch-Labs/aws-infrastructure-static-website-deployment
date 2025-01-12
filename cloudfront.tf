@@ -105,6 +105,18 @@ resource "aws_cloudfront_distribution" "my_distribution" {
     response_page_path = "/404.html"
   }
 
+  dynamic "ordered_cache_behavior" {
+    for_each = var.cloudfront_origins
+    content {
+      allowed_methods = ["GET", "HEAD"]
+      cached_methods = ["GET", "HEAD"]
+      path_pattern           = ordered_cache_behavior.value.behavior_path
+      target_origin_id       = ordered_cache_behavior.value.origin_id
+      viewer_protocol_policy = "redirect-to-https"
+      min_ttl                = 0
+    }
+  }
+
   aliases = var.domain_name_verified ? [
     var.domain_name,
     local.redirect_from_url
@@ -121,22 +133,11 @@ resource "aws_cloudfront_distribution" "my_distribution" {
     #     max_ttl                = 86400
     function_association {
       event_type   = "viewer-request"
-      function_arn = var.multi_page ? data.aws_cloudfront_function.www-redirect-with-index-redirection.arn :
-        data.aws_cloudfront_function.www-redirect-to-nonwww.arn
+      function_arn = var.multi_page ? data.aws_cloudfront_function.www-redirect-with-index-redirection.arn : data.aws_cloudfront_function.www-redirect-to-nonwww.arn
     }
   }
 
-  dynamic "ordered_cache_behavior" {
-    for_each = var.cloudfront_origins
-    content {
-      allowed_methods = ["GET", "HEAD"]
-      cached_methods = ["GET", "HEAD"]
-      path_pattern           = ordered_cache_behavior.value.behavior_path
-      target_origin_id       = ordered_cache_behavior.value.origin_id
-      viewer_protocol_policy = "redirect-to-https"
-      min_ttl                = 0
-    }
-  }
+
 
   restrictions {
     geo_restriction {
