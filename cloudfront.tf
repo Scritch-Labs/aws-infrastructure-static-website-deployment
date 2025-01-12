@@ -114,6 +114,13 @@ resource "aws_cloudfront_distribution" "my_distribution" {
       target_origin_id       = ordered_cache_behavior.value.origin_id
       viewer_protocol_policy = "redirect-to-https"
       min_ttl                = 0
+      forwarded_values {
+        query_string = false
+
+        cookies {
+          forward = "none"
+        }
+      }
     }
   }
 
