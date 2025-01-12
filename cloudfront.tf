@@ -26,12 +26,12 @@ data "aws_iam_policy_document" "allow_cloudfront_access" {
 }
 
 data "aws_cloudfront_function" "www-redirect-to-nonwww" {
-  name = "www-redirect-with-index-redirection"
+  name  = "www-redirect-with-index-redirection"
   stage = "LIVE"
 }
 
 data "aws_cloudfront_function" "www-redirect-with-index-redirection" {
-  name = "www-redirect-with-index-redirection"
+  name  = "www-redirect-with-index-redirection"
   stage = "LIVE"
 }
 
@@ -83,9 +83,9 @@ resource "aws_cloudfront_distribution" "my_distribution" {
   dynamic "origin" {
     for_each = var.cloudfront_origins
     content {
-        domain_name              = origin.value.domain_name
-        origin_access_control_id = origin.value.origin_access_control_id
-        origin_id                = origin.value.origin_id
+      domain_name              = origin.value.domain_name
+      origin_access_control_id = origin.value.origin_access_control_id
+      origin_id                = origin.value.origin_id
     }
   }
 
@@ -111,17 +111,30 @@ resource "aws_cloudfront_distribution" "my_distribution" {
   ] : []
 
   default_cache_behavior {
-    cache_policy_id  = data.aws_cloudfront_cache_policy.s3-cache-optimized.id
+    cache_policy_id        = data.aws_cloudfront_cache_policy.s3-cache-optimized.id
     allowed_methods = ["GET", "HEAD", "OPTIONS"]
     cached_methods = ["GET", "HEAD"]
-    target_origin_id = local.cloud-front.origin_id
+    target_origin_id       = local.cloud-front.origin_id
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
-#     default_ttl            = 3600
-#     max_ttl                = 86400
+    #     default_ttl            = 3600
+    #     max_ttl                = 86400
     function_association {
       event_type   = "viewer-request"
-      function_arn =  var.multi_page ? data.aws_cloudfront_function.www-redirect-with-index-redirection.arn : data.aws_cloudfront_function.www-redirect-to-nonwww.arn
+      function_arn = var.multi_page ? data.aws_cloudfront_function.www-redirect-with-index-redirection.arn :
+        data.aws_cloudfront_function.www-redirect-to-nonwww.arn
+    }
+  }
+
+  dynamic "ordered_cache_behavior" {
+    for_each = var.cloudfront_origins
+    content {
+      allowed_methods = ["GET", "HEAD"]
+      cached_methods = ["GET", "HEAD"]
+      path_pattern           = ordered_cache_behavior.value.behavior_path
+      target_origin_id       = ordered_cache_behavior.value.origin_id
+      viewer_protocol_policy = "redirect-to-https"
+      min_ttl                = 0
     }
   }
 
@@ -135,7 +148,7 @@ resource "aws_cloudfront_distribution" "my_distribution" {
     acm_certificate_arn            = var.domain_name_verified ? aws_acm_certificate.certificate.arn : null
     cloudfront_default_certificate = !var.domain_name_verified
     minimum_protocol_version       = var.domain_name_verified ? "TLSv1.2_2021" : null
-    ssl_support_method             = var.domain_name_verified ?"sni-only" : null
+    ssl_support_method             = var.domain_name_verified ? "sni-only" : null
   }
 }
 

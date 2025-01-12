@@ -52,6 +52,7 @@ variable "cloudfront_origins" {
     domain_name              = string
     origin_access_control_id = string
     origin_id                = string
+    behaviour_path           = string
   }))
 }
 
